@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: Text('Barcode Scanner Demo')),
-        body: SmartBarCodeScannerWidget(
+        body: SmartBarCodeReaderWidget(
           options: SmartBarCodeReaderOptions(
             onBarcodeDetected: (barcode) {
               print('Scanned barcode: $barcode');
@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
 ```
 
 ### Steps:
-1. Wrap your widget tree with `SmartBarCodeScannerWidget`.
+1. Wrap your widget tree with `SmartBarCodeReaderWidget`.
 2. Provide an `onBarcodeDetected` callback to handle detected barcodes.
 3. Optionally, configure `SmartBarCodeReaderOptions` for custom settings.
 
@@ -94,7 +94,7 @@ You can customize `SmartBarCodeReader` with the following options in `SmartBarCo
 Example with custom configuration:
 
 ```dart
-SmartBarCodeScannerWidget(
+SmartBarCodeReaderWidget(
   options: SmartBarCodeReaderOptions(
     onBarcodeDetected: (barcode) => print('Barcode: $barcode'),
     minLength: 6,
