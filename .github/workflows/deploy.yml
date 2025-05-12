@@ -21,7 +21,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.30.x' # Supports Dart 3.6.0
+          flutter-version: '3.29.3' # Fixed to an existing version
 
       - name: Verify Flutter setup
         run: flutter doctor -v
