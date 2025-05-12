@@ -21,7 +21,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.19.x' # Use a stable Flutter version compatible with Dart 3
+          flutter-version: '3.29.x' # Updated to support Dart 3.5.0+
 
       - name: Cache dependencies
         uses: actions/cache@v3
