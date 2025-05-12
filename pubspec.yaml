@@ -5,43 +5,17 @@ homepage: https://github.com/MR-4-Code/smart_barcode_reader
 repository: https://github.com/MR-4-Code/smart_barcode_reader
 issue_tracker: https://github.com/MR-4-Code/smart_barcode_reader/issues
 
-# Specify the Dart and Flutter SDK constraints for compatibility.
 environment:
-  sdk: ^3.5.0 # Minimum Dart SDK version (adjust based on your needs)
-  flutter: ">=3.16.0" # Minimum Flutter version for compatibility
+  sdk: ^3.5.0
+  flutter: ">=3.16.0"
 
-# Dependencies required for the package to function.
 dependencies:
   flutter:
     sdk: flutter
 
-# Development dependencies used for testing and linting.
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
 
-# Flutter-specific configuration for the package.
 flutter:
-# This package is a pure Dart/Flutter library and does not include assets or fonts.
-# If you need to add assets (e.g., images) or fonts, uncomment and configure the sections below.
-
-# Example for adding assets:
-# assets:
-#   - images/barcode_icon.png
-# For details, see: https://flutter.dev/to/asset-from-package
-
-# Example for adding fonts:
-# fonts:
-#   - family: BarcodeFont
-#     fonts:
-#       - asset: fonts/BarcodeFont-Regular.ttf
-# For details, see: https://flutter.dev/to/font-from-package
-
-# Additional metadata for pub.dev.
-# The description above is concise and descriptive to attract users.
-# The homepage and repository links point to your GitHub repo (replace 'yourusername' with your actual GitHub username).
-# The issue_tracker allows users to report bugs directly.
-
-# For more information on pubspec format, see:
-# https://dart.dev/tools/pub/pubspec
