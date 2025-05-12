@@ -2,53 +2,13 @@ name: Publish to pub.dev
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - 'v*.*.*'
 
 permissions:
-  contents: write
-  id-token: write # مطلوب لـ Trusted Publishing (OIDC)
+  contents: read
+  id-token: write  # Required for OIDC auth
 
 jobs:
-  prepare-and-publish:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version: '3.29.3'
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Increment version
-        run: |
-          CURRENT_VERSION=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
-          if [[ "$CURRENT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            CURRENT_VERSION="${CURRENT_VERSION}+0"
-            sed -i "s/version: ${CURRENT_VERSION%+0}/version: ${CURRENT_VERSION}/" pubspec.yaml
-          fi
-          VERSION_NAME=$(echo $CURRENT_VERSION | cut -d'+' -f1)
-          BUILD_NUMBER=$(echo $CURRENT_VERSION | cut -d'+' -f2 || echo 0)
-          NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
-          NEW_VERSION="$VERSION_NAME+$NEW_BUILD_NUMBER"
-          sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" pubspec.yaml
-          echo "Updated version to $NEW_VERSION"
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-
-      - name: Commit version bump
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          git add pubspec.yaml
-          git commit -m "Bump version to $NEW_VERSION"
-          git push
-
   publish:
-    needs: prepare-and-publish
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
