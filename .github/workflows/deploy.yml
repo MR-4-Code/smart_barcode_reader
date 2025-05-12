@@ -17,14 +17,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Dart
-        uses: dart-lang/setup-dart@v1
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          sdk: stable
+          channel: stable
+          flutter-version: '3.19.x' # Use a stable Flutter version compatible with Dart 3
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: Install dependencies
         run: |
-          dart pub get || (echo "Failed to get dependencies" && exit 1)
+          flutter pub get || (echo "Failed to get dependencies: $?" && exit 1)
 
       - name: Increment version
         run: |
@@ -45,4 +54,4 @@ jobs:
           git push
 
       - name: Publish to pub.dev
-        run: dart pub publish --force
+        run: flutter pub publish --force
