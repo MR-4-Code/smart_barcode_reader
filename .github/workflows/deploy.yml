@@ -21,7 +21,10 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.29.x' # Updated to support Dart 3.5.0+
+          flutter-version: '3.30.x' # Supports Dart 3.6.0
+
+      - name: Verify Flutter setup
+        run: flutter doctor -v
 
       - name: Cache dependencies
         uses: actions/cache@v3
@@ -38,6 +41,11 @@ jobs:
       - name: Increment version
         run: |
           CURRENT_VERSION=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
+          # Ensure version has a build number, default to +0 if none
+          if [[ "$CURRENT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            CURRENT_VERSION="${CURRENT_VERSION}+0"
+            sed -i "s/version: ${CURRENT_VERSION%+0}/version: ${CURRENT_VERSION}/" pubspec.yaml
+          fi
           VERSION_NAME=$(echo $CURRENT_VERSION | cut -d'+' -f1)
           BUILD_NUMBER=$(echo $CURRENT_VERSION | cut -d'+' -f2 || echo 0)
           NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
