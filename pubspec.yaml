@@ -4,6 +4,7 @@ version: 0.0.1+2
 homepage: https://github.com/MR-4-Code/smart_barcode_reader
 repository: https://github.com/MR-4-Code/smart_barcode_reader
 issue_tracker: https://github.com/MR-4-Code/smart_barcode_reader/issues
+publish_to: https://pub.dev
 
 environment:
   sdk: ^3.5.0
