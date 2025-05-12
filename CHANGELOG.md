@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - Performance improvements.
 - Fixed some bugs related to the barcode.
-- Automation publish to pub.dev see [publish.yml]
+- Automation publish to pub.dev see publish.yml
 
 ## [0.0.1+1] - 2025-05-12
 
