@@ -23,7 +23,8 @@ jobs:
           sdk: stable
 
       - name: Install dependencies
-        run: dart pub get
+        run: |
+          dart pub get || (echo "Failed to get dependencies" && exit 1)
 
       - name: Increment version
         run: |
