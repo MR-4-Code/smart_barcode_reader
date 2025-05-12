@@ -7,10 +7,10 @@ on:
 
 permissions:
   contents: write
-  id-token: write # Required for OIDC authentication
+  id-token: write # مطلوب لـ Trusted Publishing (OIDC)
 
 jobs:
-  deploy:
+  prepare-and-publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,17 +22,6 @@ jobs:
         with:
           channel: stable
           flutter-version: '3.29.3'
-
-      - name: Verify Flutter setup
-        run: flutter doctor -v
-
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
 
       - name: Install dependencies
         run: flutter pub get
@@ -52,7 +41,7 @@ jobs:
           echo "Updated version to $NEW_VERSION"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-      - name: Commit version increment
+      - name: Commit version bump
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
@@ -60,5 +49,6 @@ jobs:
           git commit -m "Bump version to $NEW_VERSION"
           git push
 
-      - name: Publish to pub.dev
-        run: flutter pub publish --force
+  publish:
+    needs: prepare-and-publish
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
