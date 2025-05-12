@@ -6,22 +6,59 @@ on:
       - master
 
 permissions:
-  id-token: write
-  contents: read
+  contents: write
+  id-token: write # Required for OIDC authentication
 
 jobs:
-  publish:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v1
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.29.3'
+
+      - name: Verify Flutter setup
+        run: flutter doctor -v
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: Install dependencies
-        run: dart pub get
+        run: flutter pub get
 
-      - name: Publish package
-        run: dart pub publish --force
+      - name: Increment version
+        run: |
+          CURRENT_VERSION=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
+          if [[ "$CURRENT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            CURRENT_VERSION="${CURRENT_VERSION}+0"
+            sed -i "s/version: ${CURRENT_VERSION%+0}/version: ${CURRENT_VERSION}/" pubspec.yaml
+          fi
+          VERSION_NAME=$(echo $CURRENT_VERSION | cut -d'+' -f1)
+          BUILD_NUMBER=$(echo $CURRENT_VERSION | cut -d'+' -f2 || echo 0)
+          NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
+          NEW_VERSION="$VERSION_NAME+$NEW_BUILD_NUMBER"
+          sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" pubspec.yaml
+          echo "Updated version to $NEW_VERSION"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Commit version increment
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add pubspec.yaml
+          git commit -m "Bump version to $NEW_VERSION"
+          git push
+
+      - name: Publish to pub.dev
+        run: flutter pub publish --force
