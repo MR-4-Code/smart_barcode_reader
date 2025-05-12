@@ -1,4 +1,4 @@
-name: Deploy to pub.dev
+name: Publish to pub.dev
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.29.3' # Fixed to an existing version
+          flutter-version: '3.29.3'
 
       - name: Verify Flutter setup
         run: flutter doctor -v
@@ -62,4 +62,4 @@ jobs:
           git push
 
       - name: Publish to pub.dev
-        run: flutter pub publish --force
+        uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
