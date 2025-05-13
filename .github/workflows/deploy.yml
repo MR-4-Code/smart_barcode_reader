@@ -42,6 +42,6 @@ jobs:
 
       - name: Create and push tag
         run: |
-          TAG_NAME="v${NEW_VERSION%%+*}"
+          TAG_NAME="v$NEW_VERSION"
           git tag "$TAG_NAME"
           git push origin "$TAG_NAME"
