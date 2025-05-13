@@ -63,11 +63,7 @@ jobs:
           echo "Created and pushed tag: $TAG_NAME"
 
   publish:
-    if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: read
       id-token: write # Required for OIDC
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
-    with:
-      environment: production # Optional: customize if needed
-      working-directory: . # Adjust if your pubspec.yaml is in a subdirectory
