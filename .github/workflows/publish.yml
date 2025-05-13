@@ -1,13 +1,73 @@
-name: Publish to pub.dev
+name: Version Bump and Publish
 
 on:
   push:
+    branches:
+      - master
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+*([+][0-9]+)?' # Matches vX.Y.Z or vX.Y.Z+BUILD
+      - 'v[0-9]+\.[0-9]+\.[0-9]+(\+[0-9]+)?' # Matches vX.Y.Z or vX.Y.Z+BUILD
+
+permissions:
+  contents: write # For committing and tagging
+  id-token: write # For OIDC authentication with pub.dev
 
 jobs:
+  version-bump:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Full history for tagging
+
+      - name: Debug event and ref
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Tag: ${{ github.ref_name }}"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.29.3'
+
+      - name: Bump version
+        run: |
+          CURRENT_VERSION=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
+          VERSION_NAME=$(echo $CURRENT_VERSION | cut -d'+' -f1)
+          BUILD_NUMBER=$(echo $CURRENT_VERSION | cut -d'+' -f2 || echo 0)
+          NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
+          NEW_VERSION="$VERSION_NAME+$NEW_BUILD_NUMBER"
+          sed -i "s/version: .*/version: $NEW_VERSION/" pubspec.yaml
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "New version: $NEW_VERSION"
+
+      - name: Commit and push version bump
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add pubspec.yaml
+          git commit -m "Bump version to $NEW_VERSION"
+          git fetch origin
+          git rebase origin/master
+          git push || echo "Push failed, retrying..." && sleep 5 && git push
+
+      - name: Create and push tag
+        run: |
+          TAG_NAME="v$NEW_VERSION"
+          git tag "$TAG_NAME"
+          git push origin "$TAG_NAME"
+          echo "Created and pushed tag: $TAG_NAME"
+
   publish:
+    if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: read
-      id-token: write # Required for authentication using OIDC
+      id-token: write # Required for OIDC
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+    with:
+      environment: production # Optional: customize if needed
+      working-directory: . # Adjust if your pubspec.yaml is in a subdirectory
