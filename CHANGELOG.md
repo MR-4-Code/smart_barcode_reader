@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Support for additional barcode formats (e.g., UPC-A, Code 128).
 - Enhanced user feedback customization options.
 
-## [0.0.1+2] - 2025-05-13
+## [0.0.1+2] - 2025-05-14
 
 ### Added
 - Performance improvements.
