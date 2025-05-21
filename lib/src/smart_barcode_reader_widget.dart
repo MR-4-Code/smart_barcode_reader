@@ -43,7 +43,7 @@ class _SmartBarCodeReaderWidgetState extends State<SmartBarCodeReaderWidget> {
           }
         },
         maxLength: options?.maxLength,
-        minLength: options?.maxLength,
+        minLength: options?.minLength,
         tolerance: options?.tolerance,
         feedbackManager: options?.userFeedbackManager,
         maxInterKeyDurationMs: options?.maxInterKeyDurationMs ?? 20,
