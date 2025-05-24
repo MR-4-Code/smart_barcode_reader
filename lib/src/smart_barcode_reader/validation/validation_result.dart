@@ -11,5 +11,5 @@ class ValidationResult {
   ValidationResult.failed(this.error) : isValid = false;
   ValidationResult.success()
       : error = '',
-        isValid = false;
+        isValid = true;
 }
