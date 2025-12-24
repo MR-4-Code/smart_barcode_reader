@@ -9,6 +9,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Support for additional barcode formats (e.g., UPC-A, Code 128).
 - Enhanced user feedback customization options.
 
+## [0.0.2+3] - 2025-12-24
+
+### Fixed
+- Fixed an issue where the scanner would lose focus, by exposing the `FocusNode` as an optional parameter. (Fixes [#1](https://github.com/MR-4-Code/smart_barcode_reader/issues/1))
+
+### Changed
+- Updated environment SDK to `^3.10.0`.
+- Updated `dev_dependencies`.
+
 ## [0.0.1+2] - 2025-05-14
 
 ### Added
