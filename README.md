@@ -134,4 +134,4 @@ For questions or support, reach out via the [GitHub repository](https://github.c
 
 Built with 💙 for Flutter developers.
 
-**Author**: MerDEV 2025
+**Author**: MrDEV 2026
