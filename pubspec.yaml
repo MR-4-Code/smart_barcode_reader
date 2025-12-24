@@ -1,6 +1,6 @@
 name: smart_barcode_reader
 description: A Flutter package for intelligently detecting and processing barcode scanner inputs, supporting formats like EAN-13 with adaptive speed and length validation.
-version: 0.0.2+3
+version: 0.0.2+4
 homepage: https://github.com/MR-4-Code/smart_barcode_reader
 repository: https://github.com/MR-4-Code/smart_barcode_reader
 issue_tracker: https://github.com/MR-4-Code/smart_barcode_reader/issues
