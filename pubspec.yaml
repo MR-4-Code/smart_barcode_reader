@@ -6,7 +6,7 @@ repository: https://github.com/MR-4-Code/smart_barcode_reader
 issue_tracker: https://github.com/MR-4-Code/smart_barcode_reader/issues
 
 environment:
-  sdk: ^3.5.0
+  sdk: ^3.10.0
   flutter: ">=3.16.0"
 
 dependencies:
