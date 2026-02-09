@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/services.dart';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:smart_barcode_reader/smart_barcode_reader.dart';
-import 'validation/barcode_validator.dart';
+
+import 'adaptive_threshold_manager.dart';
 import 'input_classifier.dart';
 import 'key_event_processor.dart';
-import 'adaptive_threshold_manager.dart';
+import 'validation/barcode_validator.dart';
 
 /// A highly intelligent barcode reader that processes keyboard events to detect
 /// barcode scanner input with precision and adaptability.
@@ -76,32 +78,40 @@ class SmartBarCodeReader {
     RegExp? validCharPattern,
     Set<BarcodeFormat> supportedFormats = const {BarcodeFormat.ean13},
     UserFeedbackManager? feedbackManager,
-  })  : _eventProcessor = KeyEventProcessor(),
-        _validator = BarcodeValidator(
-          minLength: minLength,
-          maxLength: maxLength,
-          validCharPattern: validCharPattern,
-          supportedFormats: supportedFormats,
-        ),
-        _classifier = InputClassifier(
-            maxInterKeyDurationMs: maxInterKeyDurationMs, tolerance: tolerance),
-        _thresholdManager = AdaptiveThresholdManager(
-          initialInterKeyDurationMs: maxInterKeyDurationMs?.toDouble(),
-          initialMinLength: minLength?.toDouble(),
-        ),
-        _feedbackManager = feedbackManager;
+  }) : _eventProcessor = KeyEventProcessor(),
+       _validator = BarcodeValidator(
+         minLength: minLength,
+         maxLength: maxLength,
+         validCharPattern: validCharPattern,
+         supportedFormats: supportedFormats,
+       ),
+       _classifier = InputClassifier(
+         maxInterKeyDurationMs: maxInterKeyDurationMs,
+         tolerance: tolerance,
+       ),
+       _thresholdManager = AdaptiveThresholdManager(
+         initialInterKeyDurationMs: maxInterKeyDurationMs?.toDouble(),
+         initialMinLength: minLength?.toDouble(),
+       ),
+       _feedbackManager = feedbackManager;
 
   /// Handles a keyboard event and processes it as potential barcode input.
   ///
   /// Returns the current barcode buffer for debugging purposes.
   String handleKeyEvent(KeyEvent event) {
-    if (_isProcessing) return _eventProcessor.buffer;
+    try {
+      if (_isProcessing) return _eventProcessor.buffer;
 
-    if (event is KeyDownEvent && event.character != null) {
-      _processKeyEvent(event);
+      if (event is KeyDownEvent && event.character != null) {
+        _processKeyEvent(event);
+      }
+
+      return _eventProcessor.buffer;
+    } catch (error, stackTrace) {
+      _log('[handleKeyEvent] , $error , $stackTrace');
+      _resetState();
+      return _eventProcessor.buffer;
     }
-
-    return _eventProcessor.buffer;
   }
 
   /// Processes a key down event by coordinating with other components.
@@ -118,7 +128,8 @@ class SmartBarCodeReader {
 
     if (_eventProcessor.buffer.length < (minLength ?? 6)) {
       _log(
-          'Input too short, waiting for more characters: ${_eventProcessor.buffer}');
+        'Input too short, waiting for more characters: ${_eventProcessor.buffer}',
+      );
       _resetTimeout();
       return;
     }
@@ -147,7 +158,8 @@ class SmartBarCodeReader {
     if (score < 0.65) {
       _feedbackManager?.showFeedback('Input too slow or invalid');
       _log(
-          'Input rejected, low score: ${_eventProcessor.buffer} (score: $score)');
+        'Input rejected, low score: ${_eventProcessor.buffer} (score: $score)',
+      );
       _resetState();
       return;
     }
@@ -186,13 +198,13 @@ class SmartBarCodeReader {
     if (timestamps.length >= 3) {
       final durations = <double>[];
       for (int i = 1; i < timestamps.length; i++) {
-        durations.add(timestamps[i]
-            .difference(timestamps[i - 1])
-            .inMilliseconds
-            .toDouble());
+        durations.add(
+          timestamps[i].difference(timestamps[i - 1]).inMilliseconds.toDouble(),
+        );
       }
       final mean = durations.reduce((a, b) => a + b) / durations.length;
-      final variance = durations
+      final variance =
+          durations
               .map((d) => (d - mean) * (d - mean))
               .reduce((a, b) => a + b) /
           durations.length;
@@ -216,7 +228,8 @@ class SmartBarCodeReader {
     if (!validationResult.isValid) {
       _feedbackManager?.showFeedback(validationResult.error);
       _log(
-          'Validation failed: ${_eventProcessor.buffer} (${validationResult.error})');
+        'Validation failed: ${_eventProcessor.buffer} (${validationResult.error})',
+      );
       _resetState();
       _isProcessing = false;
       return;
@@ -225,11 +238,9 @@ class SmartBarCodeReader {
     // Remove trailing newline if present
     final processedBarcode = _eventProcessor.buffer.replaceAll('\n', '');
 
-    _log('Processing barcode: $processedBarcode (score: ${_classifier.classify(
-      _eventProcessor.timestamps,
-      _eventProcessor.buffer.length,
-      _thresholdManager.adaptiveInterKeyDurationMs,
-    )})');
+    _log(
+      'Processing barcode: $processedBarcode (score: ${_classifier.classify(_eventProcessor.timestamps, _eventProcessor.buffer.length, _thresholdManager.adaptiveInterKeyDurationMs)})',
+    );
     onBarcodeDetected(processedBarcode);
     _resetState();
     _isProcessing = false;
