@@ -20,14 +20,18 @@ import 'smart_barcode_reader/smart_barcode_reader.dart';
 /// [focusNode] is optional params
 class SmartBarCodeReaderWidget extends StatefulWidget {
   final SmartBarCodeReaderOptions? options;
-  final Widget? child;
+
   final FocusNode? focusNode;
+  final FocusScopeNode? focusScopeNode;
+
+  final Widget? child;
 
   const SmartBarCodeReaderWidget({
     super.key,
     this.child,
     this.options,
     this.focusNode,
+    this.focusScopeNode,
   });
 
   @override
@@ -38,11 +42,19 @@ class SmartBarCodeReaderWidget extends StatefulWidget {
 class _SmartBarCodeReaderWidgetState extends State<SmartBarCodeReaderWidget> {
   late final SmartBarCodeReader _reader;
   late final FocusNode focusNode;
+  late final FocusScopeNode focusScopeNode;
 
   @override
   void initState() {
     super.initState();
+    focusScopeNode = widget.focusScopeNode ?? FocusScopeNode();
     focusNode = widget.focusNode ?? FocusNode();
+
+    focusNode.addListener(() {
+      if (!focusNode.hasFocus) {
+        focusNode.requestFocus();
+      }
+    });
 
     final options = widget.options;
 
@@ -73,12 +85,26 @@ class _SmartBarCodeReaderWidgetState extends State<SmartBarCodeReaderWidget> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    focusNode.requestFocus();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return KeyboardListener(
-      autofocus: true,
-      focusNode: focusNode,
-      onKeyEvent: _reader.handleKeyEvent,
-      child: widget.child ?? const SizedBox(),
+    return FocusScope(
+      node: focusScopeNode,
+      onFocusChange: (hasFocus) {
+        if (!hasFocus) {
+          focusNode.requestFocus();
+        }
+      },
+      child: KeyboardListener(
+        autofocus: true,
+        focusNode: focusNode,
+        onKeyEvent: _reader.handleKeyEvent,
+        child: widget.child ?? const SizedBox(),
+      ),
     );
   }
 }
