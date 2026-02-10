@@ -88,11 +88,11 @@ class _SmartBarCodeReaderWidgetState extends State<SmartBarCodeReaderWidget> {
   Widget build(BuildContext context) {
     return FocusScope(
       node: focusScopeNode,
-      onFocusChange: (hasFocus) {
-        if (!hasFocus) {
-          focusNode.requestFocus();
-        }
-      },
+      // onFocusChange: (hasFocus) {
+      //   if (!hasFocus) {
+      //     focusNode.requestFocus();
+      //   }
+      // },
       child: KeyboardListener(
         autofocus: true,
         focusNode: focusNode,
