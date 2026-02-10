@@ -50,12 +50,6 @@ class _SmartBarCodeReaderWidgetState extends State<SmartBarCodeReaderWidget> {
     focusScopeNode = widget.focusScopeNode ?? FocusScopeNode();
     focusNode = widget.focusNode ?? FocusNode();
 
-    focusNode.addListener(() {
-      if (!focusNode.hasFocus) {
-        focusNode.requestFocus();
-      }
-    });
-
     final options = widget.options;
 
     //To setup barcode reader from [options]

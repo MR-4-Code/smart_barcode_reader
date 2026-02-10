@@ -155,7 +155,7 @@ class SmartBarCodeReader {
       _eventProcessor.buffer.length,
       _thresholdManager.adaptiveInterKeyDurationMs,
     );
-    if (score < 0.5) {
+    if (score < 0.65) {
       _feedbackManager?.showFeedback('Input too slow or invalid');
       _log(
         'Input rejected, low score: ${_eventProcessor.buffer} (score: $score)',
@@ -165,7 +165,7 @@ class SmartBarCodeReader {
     }
 
     // Wait for expected length (e.g., 13 for EAN-13) or newline
-    if (_eventProcessor.buffer.length < (minLength ?? 8) &&
+    if (_eventProcessor.buffer.length < 13 &&
         !_eventProcessor.buffer.endsWith('\n')) {
       _log('Waiting for full barcode: ${_eventProcessor.buffer}');
       _resetTimeout();
@@ -209,9 +209,7 @@ class SmartBarCodeReader {
               .reduce((a, b) => a + b) /
           durations.length;
       final stdDev = sqrt(variance);
-      if (stdDev >
-          _thresholdManager.adaptiveInterKeyDurationMs *
-              (_classifier.maxInterKeyDurationMs != null ? 5.5 : 2.0)) {
+      if (stdDev > _thresholdManager.adaptiveInterKeyDurationMs * 2) {
         return true;
       }
     }
